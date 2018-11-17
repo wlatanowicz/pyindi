@@ -28,14 +28,14 @@ class Element:
     def value(self, value):
         self._new_value = value
 
-    def process_message(self, msg):
+    def process_message(self, msg: parts.OneIndiMessagePart):
         if isinstance(msg, self.set_message_class):
             old_value = self.value
             self._value = msg.value
             if self._value != old_value:
                 self.vector.device.client.trigger_change(self, 'value')
 
-    def to_new_message(self):
+    def to_new_message(self) -> parts.IndiMessagePart:
         return self.new_message_class(
             name=self.name,
             value=self._new_value

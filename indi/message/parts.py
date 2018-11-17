@@ -40,67 +40,63 @@ class IndiMessagePart:
         return element
 
 
-class DefBLOB(IndiMessagePart):
-    def __init__(self, name, label=None, **junk):
+class DefIndiMessagePart(IndiMessagePart):
+    def __init__(self, name: str, label: str=None, **junk):
         self.name = name
         self.label = label
 
 
-class DefLight(IndiMessagePart):
-    def __init__(self, name, label=None, **junk):
-        self.name = name
-        self.label = label
+class DefBLOB(DefIndiMessagePart):
+    pass
 
 
-class DefNumber(IndiMessagePart):
-    def __init__(self, name, format, min, max, step, label=None, **junk):
-        self.name = name
+class DefLight(DefIndiMessagePart):
+    pass
+
+
+class DefNumber(DefIndiMessagePart):
+    def __init__(self, name: str, format, min, max, step, label: str=None, **junk):
+        super().__init__(name, label)
         self.format = format
         self.min = min
         self.max = max
         self.step = step
-        self.label = label
 
 
-class DefSwitch(IndiMessagePart):
-    def __init__(self, name, label=None, **junk):
+class DefSwitch(DefIndiMessagePart):
+    pass
+
+
+class DefText(DefIndiMessagePart):
+    pass
+
+
+class OneIndiMessagePart(IndiMessagePart):
+    def __init__(self, name, value, **junk):
         self.name = name
-        self.label = label
+        self.value = value
 
 
-class DefText(IndiMessagePart):
-    def __init__(self, name, label=None, **junk):
-        self.name = name
-        self.label = label
-
-
-class OneBLOB(IndiMessagePart):
+class OneBLOB(OneIndiMessagePart):
     def __init__(self, name, size, format, value, **junk):
-        self.name = name
+        super().__init__(name, value)
         self.size = size
         self.format = format
-        self.value = value
 
 
-class OneLight(IndiMessagePart):
+class OneLight(OneIndiMessagePart):
     def __init__(self, name, value, **junk):
-        self.name = name
-        self.value = checks.dictionary(value, const.State)
+        super().__init__(name, checks.dictionary(value, const.State))
 
 
-class OneNumber(IndiMessagePart):
+class OneNumber(OneIndiMessagePart):
+    pass
+
+
+class OneSwitch(OneIndiMessagePart):
     def __init__(self, name, value, **junk):
-        self.name = name
-        self.value = value
+        super().__init__(name, checks.dictionary(value, const.SwitchState))
 
 
-class OneSwitch(IndiMessagePart):
-    def __init__(self, name, value, **junk):
-        self.name = name
-        self.value = checks.dictionary(value, const.SwitchState)
-
-
-class OneText(IndiMessagePart):
-    def __init__(self, name, value, **junk):
-        self.name = name
-        self.value = value
+class OneText(OneIndiMessagePart):
+    pass

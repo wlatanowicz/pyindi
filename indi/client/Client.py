@@ -1,3 +1,4 @@
+import typing
 import uuid
 import threading
 from indi.client.elements import Element
@@ -16,16 +17,16 @@ class Client:
         self.blob_connection_handler = None
         self.callbacks = []
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Device:
         return self.devices[key]
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return key in self.devices
 
-    def get_device(self, name):
+    def get_device(self, name: str) -> Device:
         return self.devices.get(name)
 
-    def set_device(self, name, device):
+    def set_device(self, name: str, device: Device):
         self.devices[name] = device
         self.control_connection_handler.send_message(
             message.EnableBLOB(device=name, value=const.BLOBEnable.NEVER)
@@ -34,7 +35,7 @@ class Client:
             message.EnableBLOB(device=name, value=const.BLOBEnable.ONLY)
         )
 
-    def process_message(self, msg):
+    def process_message(self, msg: message.IndiMessage):
         device = None
         if isinstance(msg, message.DefVector):
             device = self.get_device(msg.device)
@@ -51,7 +52,7 @@ class Client:
         if device:
             device.process_message(msg)
 
-    def send_message(self, msg):
+    def send_message(self, msg: message.IndiMessage):
         self.control_connection_handler.send_message(msg)
 
     def start(self):
@@ -62,7 +63,7 @@ class Client:
             message.GetProperties(version='2.0')
         )
 
-    def onchange(self, *, callback, device=None, vector=None, element=None, what='value'):
+    def onchange(self, *, callback: typing.Callable, device: str=None, vector: str=None, element: str=None, what: str='value') -> uuid.UUID:
         uid = uuid.uuid4()
         self.callbacks.append(dict(
             what=what,
@@ -74,7 +75,7 @@ class Client:
         ))
         return uid
 
-    def rmonchange(self, uuid=None, device=None, vector=None, element=None, what=None, callback=None):
+    def rmonchange(self, uuid: uuid.UUID=None, device: str=None, vector: str=None, element: str=None, what: str=None, callback: typing.Callable=None):
         to_rm = list()
         for cb in self.callbacks:
             if uuid in (None, cb['uuid'],) \
@@ -88,7 +89,7 @@ class Client:
         for cb in to_rm:
             self.callbacks.remove(cb)
 
-    def waitforchange(self, device=None, vector=None, element=None, what=None, expect=None, cmp=None, timeout=-1, initial=None):
+    def waitforchange(self, device: str=None, vector: str=None, element: str=None, what: str=None, expect=None, cmp=None, timeout=-1, initial=None):
         if cmp is None:
             cmp = lambda a, b: a == b
 

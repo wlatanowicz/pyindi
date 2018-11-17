@@ -21,10 +21,10 @@ class Vector:
         children = checks.children([elements.Element.from_message(self, c) for c in msg.children], self.children_class)
         self.elements = {ch.name: ch for ch in children}
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> elements.Element:
         return self.elements[key]
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return key in self.elements
 
     @classmethod
