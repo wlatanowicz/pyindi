@@ -70,6 +70,51 @@ _STANDARD_VECTORS = {
         ),
     },
 
+    'FOCUS_MOTION': {
+        'class': properties.SwitchVector,
+        'elements': dict(
+            inward='FOCUS_INWARD',
+            outward='FOCUS_OUTWARD',
+        ),
+    },
+
+    # DOME
+
+    'DOME_MOTION': {
+        'class': properties.SwitchVector,
+        'elements': dict(
+            cw='DOME_CW',
+            ccw='DOME_CCW',
+        ),
+    },
+
+    'DOME_AUTOSYNC': {
+        'class': properties.SwitchVector,
+        'elements': dict(
+            enable='DOME_AUTOSYNC_ENABLE',
+            disable='DOME_AUTOSYNC_DISABLE',
+        ),
+    },
+
+    'ABS_DOME_POSITION': {
+        'class': properties.NumberVector,
+        'elements': dict(
+            position='DOME_ABSOLUTE_POSITION',
+        ),
+    },
+
+    'DOME_MEASUREMENTS': {
+        'class': properties.NumberVector,
+        'elements': dict(
+            radius='DM_DOME_RADIUS',
+            shutter_width='DOME_SHUTTER_WIDTH',
+            north_displacement='DM_NORTH_DISPLACEMENT',
+            east_displacement='DM_EAST_DISPLACEMENT',
+            up_displacement='DM_UP_DISPLACEMENT',
+            ota_offset='DM_OTA_OFFSET',
+        ),
+    },
+
 }
 
 
