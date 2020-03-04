@@ -6,6 +6,7 @@ from .proxy import Proxy
 
 
 def non_blocking(fun):
+    raise Exception("Obsolete")
     @wraps(fun)
     def wrapped(*args, **kwargs):
         import threading

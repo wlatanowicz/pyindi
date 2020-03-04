@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Callable, Dict, Optional, Union
 
@@ -65,7 +66,7 @@ class Driver(Device, metaclass=DriverMeta):
         if self._router and msg:
             self._router.process_message(msg, self)
 
-    def message_from_client(self, msg: IndiMessage):
+    async def message_from_client(self, msg: IndiMessage):
         if isinstance(msg, message.GetProperties):
             if not msg.name:
                 for k, v in self._vectors.items():
@@ -92,6 +93,10 @@ class Driver(Device, metaclass=DriverMeta):
             callback_fun = callback
 
         try:
-            callback_fun(sender, **kwargs)
+            if asyncio.iscoroutine(callback_fun):
+                loop = asyncio.get_event_loop()
+                loop.create_task(callback_fun(sender, **kwargs))
+            else:
+                callback_fun(sender, **kwargs)
         except Exception as e:
             logging.exception(e)

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from devices import *
@@ -12,4 +13,7 @@ router = Router()
 DevicePool.init(router)
 
 server = TCPServer(router=router)
-server.start()
+
+loop = asyncio.get_event_loop()
+loop.create_task(server.start())
+loop.run_forever()

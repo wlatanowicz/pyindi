@@ -21,7 +21,7 @@ class Buffer:
         if start >= 0:
             self.data = self.data[start:]
 
-    def process(self, callback):
+    async def process(self, callback):
         self._cleanup_buffer()
         end = 0
         while len(self.data) > 0 and end >= 0:
@@ -37,7 +37,7 @@ class Buffer:
                     end = 0
                     try:
                         message = IndiMessage.from_string(partial)
-                        callback(message)
+                        await callback(message)
                     except Exception as ex:
                         logging.warning("Buffer: Contents is not a valid message")
                         logging.exception(ex)

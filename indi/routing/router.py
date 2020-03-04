@@ -1,5 +1,7 @@
+import asyncio
 import logging
 import threading
+from typing import Optional
 
 from indi.message import EnableBLOB, NewBLOBVector, const
 
@@ -11,15 +13,18 @@ class Router:
 
     DEFAULT_BLOB_POLICY = const.BLOBEnable.NEVER
 
-    def __init__(self):
+    def __init__(self, loop:Optional[asyncio.AbstractEventLoop] = None):
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        self.loop = loop
         self.clients = []
         self.devices = []
         self.blob_routing = {}
 
     @classmethod
-    def instance(cls):
+    def instance(cls, loop:Optional[asyncio.AbstractEventLoop] = None):
         if not cls._instance:
-            cls._instance = cls()
+            cls._instance = cls(loop=loop)
         return cls._instance
 
     def register_device(self, device):
@@ -48,7 +53,7 @@ class Router:
                 if not device == sender and (
                     not message.device or device.accepts(message.device)
                 ):
-                    device.message_from_client(message)
+                    self.loop.create_task(device.message_from_client(message))
 
         if message.from_device:
             for client in self.clients:
@@ -62,12 +67,7 @@ class Router:
                         and client_blob_policy
                         in (const.BLOBEnable.ALSO, const.BLOBEnable.ONLY,)
                     ) or (not is_blob and client_blob_policy == const.BLOBEnable.NEVER):
-
-                        def send():
-                            client.message_from_device(message)
-
-                        th = threading.Thread(target=send, daemon=True)
-                        th.start()
+                        self.loop.create_task(client.message_from_device(message))
 
     def process_enable_blob(self, message, sender):
         self.blob_routing[sender][message.name] = message.value
